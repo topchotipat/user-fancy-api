@@ -2,6 +2,11 @@ const User = require('../../models/User')
 const bcrypt = require('bcrypt')
 
 exports.signup = (req, res) => {
+    const email = req.body.email
+    const password = req.body.password
+    if(!email || !password){
+        return res.status(400).send({error: 'user or password incorrect'})
+    }
     User.findOne({ email: req.body.email })
         .then(user => {
             if (user) {
@@ -12,9 +17,8 @@ exports.signup = (req, res) => {
                     password: req.body.password
                 })
 
-                bcrypt.genSalt(10, (err, salt) => {
-                    bcrypt.hash(newUser.password, salt, (err, hash) => {
-                        if (err) throw err
+                bcrypt.genSalt(10, (_, salt) => {
+                    bcrypt.hash(newUser.password, salt, (_, hash) => {
                         newUser.password = hash
                         newUser.save()
                             .then(user => res.json(
