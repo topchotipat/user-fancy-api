@@ -47,7 +47,7 @@ exports.signup = async (req, res, next) => {
     }
 }
 
-exports.signin = async (req, res, next) => {
+exports.login = async (req, res, next) => {
     const email = req.body.email
     const password = req.body.password
 
@@ -65,7 +65,7 @@ exports.signin = async (req, res, next) => {
             const payload = { id: user.id, email, time }
             jwt.sign(
                 payload,
-                key.secretKey,
+                key.secretOrKey,
                 { expiresIn: '30m' },
                 (_, token) => {
                     res.json({
@@ -86,4 +86,10 @@ exports.signin = async (req, res, next) => {
     } catch (error) {
         next(error)
     }
+}
+
+exports.user = (req, res) => {
+    res.json({
+        user: req.user
+    })
 }
