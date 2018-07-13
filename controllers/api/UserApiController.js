@@ -1,46 +1,56 @@
 const User = require('../../models/User')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+const key = require('../../config')
 
-exports.signup = (req, res) => {
+const time = new Date().getTime()
+
+exports.signup = async (req, res, next) => {
     const email = req.body.email
     const password = req.body.password
-    if (!email || !password) {
-        return res.status(400).send({ error: 'user or password incorrect' })
-    }
-    User.findOne({ email: req.body.email })
-        .then(user => {
-            if (user) {
-                return res.status(400).json({ email: 'email already exists' })
-            } else {
-                const newUser = new User({
-                    email: req.body.email,
-                    password: req.body.password
-                })
+    const signup_time = time
 
-                bcrypt.genSalt(10, (_, salt) => {
-                    bcrypt.hash(newUser.password, salt, (_, hash) => {
-                        newUser.password = hash
-                        newUser.save()
-                            .then(user => res.json(
-                                {
-                                    data: {
-                                        email: user.email,
-                                        password: user.password
-                                    },
-                                    code: 200,
-                                    status: "ok"
-                                }
-                            ))
-                            .catch(err => console.log(err))
-                    })
-                })
-            }
-        })
+    if (!email || !password) {
+        res.status(400).send({ error: 'user or password incorrect' })
+    }
+    try {
+        const user = await User.findOne({ email })
+        if (user) {
+            return res.status(400).json({ email: 'email already exists' })
+        } else {
+            const newUser = new User({
+                email,
+                password,
+                signup_time
+            })
+
+            const salt = await bcrypt.genSalt(10)
+            const hash = await bcrypt.hash(newUser.password, salt)
+
+            newUser.password = hash
+            const genUser = await newUser.save()
+
+            res.json(
+                {
+                    data: {
+                        email,
+                        password: genUser.password,
+                        signup_time
+                    },
+                    code: 200,
+                    status: 'OK'
+                }
+            )
+        }
+    } catch (error) {
+        next(error)
+    }
 }
 
 exports.signin = async (req, res, next) => {
     const email = req.body.email
     const password = req.body.password
+
     try {
         const user = await User.findOne({
             email
@@ -52,7 +62,23 @@ exports.signin = async (req, res, next) => {
         const isMatch = await bcrypt.compare(password, user.password)
 
         if (isMatch) {
-            res.json({ ok: "Ok" })
+            const payload = { id: user.id, email, time }
+            jwt.sign(
+                payload,
+                key.secretKey,
+                { expiresIn: '30m' },
+                (_, token) => {
+                    res.json({
+                        data: {
+                            email,
+                            token,
+                            logged_in_at: time
+                        },
+                        code: 200,
+                        status: 'OK'
+                    })
+                }
+            )
         } else {
             res.status(400).json({ password: 'password incorrect' })
         }
