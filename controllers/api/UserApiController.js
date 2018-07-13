@@ -4,8 +4,8 @@ const bcrypt = require('bcrypt')
 exports.signup = (req, res) => {
     const email = req.body.email
     const password = req.body.password
-    if(!email || !password){
-        return res.status(400).send({error: 'user or password incorrect'})
+    if (!email || !password) {
+        return res.status(400).send({ error: 'user or password incorrect' })
     }
     User.findOne({ email: req.body.email })
         .then(user => {
@@ -36,4 +36,28 @@ exports.signup = (req, res) => {
                 })
             }
         })
+}
+
+exports.signin = async (req, res, next) => {
+    const email = req.body.email
+    const password = req.body.password
+    try {
+        const user = await User.findOne({
+            email
+        })
+        if (!user) {
+            res.status(404).json({ email: 'email not found' })
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password)
+
+        if (isMatch) {
+            res.json({ ok: "Ok" })
+        } else {
+            res.status(400).json({ password: 'password incorrect' })
+        }
+
+    } catch (error) {
+        next(error)
+    }
 }
