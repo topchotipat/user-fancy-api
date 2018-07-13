@@ -1,5 +1,5 @@
-const signup = require('./controllers/api/user/signup')
+const user = require('./controllers/api/UserApiController')
 
 module.exports = (app) =>{
-    app.get('/api/user/signup', signup)
+    app.post('/api/user/signup', user.signup)
 }
