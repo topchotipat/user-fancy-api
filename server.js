@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const router = require('./router')
 const bodyParser = require('body-parser')
+const passport = require('passport');
 
 const app = express()
 
@@ -13,6 +14,7 @@ mongoose.connect(db, { useNewUrlParser: true })
 
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
+app.use(passport.initialize());
 router(app)
 
 const port = process.env.PORT || 4000

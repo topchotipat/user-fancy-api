@@ -10,17 +10,17 @@ exports.signup = async (req, res, next) => {
     const email = req.body.email
     const password = req.body.password
     const signup_time = time
-    const { errors, isValid } = validate(req.body)
-
-    if (!isValid) {
-        res.status(400).json({
-            error: errors,
-            code: 400,
-            status: 'Bad Request'
-        })
-    }
 
     try {
+        const { errors, isValid } = await validate(req.body)
+        if (!isValid) {
+            res.status(400).json({
+                error: errors,
+                code: 400,
+                status: 'Bad Request'
+            })
+        }
+    
         const user = await User.findOne({ email })
         if (user) {
             res.status(400).json({
@@ -63,17 +63,18 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res, next) => {
     const email = req.body.email
     const password = req.body.password
-    const { errors, isValid } = validate(req.body)
-
-    if (!isValid) {
-        res.status(400).json({
-            error: errors,
-            code: 400,
-            status: 'Bad Request'
-        })
-    }
-
+   
     try {
+        const { errors, isValid } = await validate(req.body)
+
+        if (!isValid) {
+            res.status(400).json({
+                error: errors,
+                code: 400,
+                status: 'Bad Request'
+            })
+        }
+
         const user = await User.findOne({
             email
         })
@@ -108,10 +109,16 @@ exports.login = async (req, res, next) => {
                 }
             )
         } else {
-            next(error)
+            res.status(400).json({
+                error: {
+                    password: 'password is invalid'
+                },
+                code: 400,
+                status: 'Bad Request'
+            })
         }
     } catch (error) {
-        next(error)
+       next(error)
     }
 }
 
