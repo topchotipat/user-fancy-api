@@ -20,7 +20,7 @@ exports.signup = async (req, res, next) => {
                 status: 'Bad Request'
             })
         }
-    
+
         const user = await User.findOne({ email })
         if (user) {
             res.status(400).json({
@@ -63,7 +63,7 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res, next) => {
     const email = req.body.email
     const password = req.body.password
-   
+
     try {
         const { errors, isValid } = await validate(req.body)
 
@@ -80,9 +80,7 @@ exports.login = async (req, res, next) => {
         })
         if (!user) {
             res.status(404).json({
-                error: {
-                    email: 'email not found'
-                },
+                error: 'email not found',
                 code: 404,
                 status: 'Not Found'
             })
@@ -110,15 +108,13 @@ exports.login = async (req, res, next) => {
             )
         } else {
             res.status(400).json({
-                error: {
-                    password: 'password is invalid'
-                },
+                error: 'password is invalid',
                 code: 400,
                 status: 'Bad Request'
             })
         }
     } catch (error) {
-       next(error)
+        next(error)
     }
 }
 
