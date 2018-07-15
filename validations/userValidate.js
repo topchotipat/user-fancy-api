@@ -18,7 +18,7 @@ module.exports = data => {
     }else if (validator.isEmpty(data.password)) {
         errors.push('Password is required')
     } else if (!validator.isLength(data.password,{min: 8, max: 20})) {
-        errors.push('Password is invalid')
+        errors.push('Password is 8 to 20 character')
     }
 
     return {

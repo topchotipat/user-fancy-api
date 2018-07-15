@@ -24,9 +24,7 @@ exports.signup = async (req, res, next) => {
         const user = await User.findOne({ email })
         if (user) {
             res.status(400).json({
-                error: {
-                    email: 'Email already exists'
-                },
+                error: 'Email already exists',
                 code: 400,
                 status: 'Bad Request'
             })
@@ -89,7 +87,7 @@ exports.login = async (req, res, next) => {
         const isMatch = await bcrypt.compare(password, user.password)
 
         if (isMatch) {
-            const payload = { id: user.id, email, time }
+            const payload = { id: user.id, email }
             jwt.sign(
                 payload,
                 key.secretOrKey,
