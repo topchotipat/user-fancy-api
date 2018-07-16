@@ -78,7 +78,7 @@ exports.login = async (req, res, next) => {
         })
         if (!user) {
             res.status(404).json({
-                error: 'email not found',
+                error: 'Email not found',
                 code: 404,
                 status: 'Not Found'
             })
@@ -106,7 +106,7 @@ exports.login = async (req, res, next) => {
             )
         } else {
             res.status(400).json({
-                error: 'password is invalid',
+                error: 'Password is invalid',
                 code: 400,
                 status: 'Bad Request'
             })

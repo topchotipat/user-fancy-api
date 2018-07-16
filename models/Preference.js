@@ -6,28 +6,34 @@ const preferenceSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'users'
     },
-    localization:{
+    localization: {
         language: {
-            type: String
+            type: String,
+            required: true
         },
         timeZone: {
-            type: Date
+            type: String,
+            required: true
         },
-        currency:{
-            type: String
+        currency: {
+            type: String,
+            required: true
         }
     },
-    privacy:{
-        profileVisibility:{
-            type: String
+    privacy: {
+        profileVisibility: {
+            type: String,
+            required: true
         },
-        messages:{
-            type: String
+        messages: {
+            type: String,
+            required: true
         }
     },
-    content:{
-        categoryLists:{
-            type: Boolean
+    content: {
+        categoryLists: {
+            type: String,
+            required: true
         }
     }
 })
