@@ -10,7 +10,6 @@ Example Request
 
 ```
 GET     http://localhost:4000/api/preference
-
 ```
 
 with header

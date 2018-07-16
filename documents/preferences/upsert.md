@@ -57,8 +57,6 @@ Content-Type: application/json, Authorization: {JWT Token}
 
 ## Failures
 
-Example.
-
 ```javascript
 {
     "code": 401,
