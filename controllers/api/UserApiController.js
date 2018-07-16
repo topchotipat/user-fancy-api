@@ -10,23 +10,21 @@ exports.signup = async (req, res, next) => {
     const email = req.body.email
     const password = req.body.password
     const signup_time = time
-    const { errors, isValid } = validate(req.body)
-
-    if (!isValid) {
-        res.status(400).json({
-            error: errors,
-            code: 400,
-            status: 'Bad Request'
-        })
-    }
 
     try {
+        const { errors, isValid } = await validate(req.body)
+        if (!isValid) {
+            res.status(400).json({
+                error: errors,
+                code: 400,
+                status: 'Bad Request'
+            })
+        }
+
         const user = await User.findOne({ email })
         if (user) {
             res.status(400).json({
-                error: {
-                    email: 'Email already exists'
-                },
+                error: 'Email already exists',
                 code: 400,
                 status: 'Bad Request'
             })
@@ -63,25 +61,24 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res, next) => {
     const email = req.body.email
     const password = req.body.password
-    const { errors, isValid } = validate(req.body)
-
-    if (!isValid) {
-        res.status(400).json({
-            error: errors,
-            code: 400,
-            status: 'Bad Request'
-        })
-    }
 
     try {
+        const { errors, isValid } = await validate(req.body)
+
+        if (!isValid) {
+            res.status(400).json({
+                error: errors,
+                code: 400,
+                status: 'Bad Request'
+            })
+        }
+
         const user = await User.findOne({
             email
         })
         if (!user) {
             res.status(404).json({
-                error: {
-                    email: 'email not found'
-                },
+                error: 'Email not found',
                 code: 404,
                 status: 'Not Found'
             })
@@ -90,7 +87,7 @@ exports.login = async (req, res, next) => {
         const isMatch = await bcrypt.compare(password, user.password)
 
         if (isMatch) {
-            const payload = { id: user.id, email, time }
+            const payload = { id: user.id, email }
             jwt.sign(
                 payload,
                 key.secretOrKey,
@@ -108,7 +105,11 @@ exports.login = async (req, res, next) => {
                 }
             )
         } else {
-            next(error)
+            res.status(400).json({
+                error: 'Password is invalid',
+                code: 400,
+                status: 'Bad Request'
+            })
         }
     } catch (error) {
         next(error)
